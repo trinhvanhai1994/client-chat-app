@@ -3,11 +3,11 @@ import MemberDataService from '../../service/MemberDataService';
 
 class ListMembersComponent extends Component {
     constructor(props) {
-        super(props)
+        super(props);
         this.state = {
             members: [],
             message: null
-        }
+        };
         this.deleteMemberClicked = this.deleteMemberClicked.bind(this)
         this.updateMemberClicked = this.updateMemberClicked.bind(this)
         this.addMemberClicked = this.addMemberClicked.bind(this)

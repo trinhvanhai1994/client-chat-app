@@ -4,6 +4,7 @@ import ListMembersComponent from './member/ListMemberComponent';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import RoomComponent from './room/RoomComponent';
 import MemberComponent from './member/MemberComponent';
+import SingupComponent from "./credentials/singup/SingupComponent";
 
 class RouterApp extends Component {
     render() {
@@ -12,6 +13,8 @@ class RouterApp extends Component {
                 <>
                     <h1>Instructor Application</h1>
                     <Switch>
+                        <Route path="/members" component={MemberComponent} />
+                        <Route path="/signup" exact component={SingupComponent} />
                         <Route path="/" exact component={ListRoomsComponent} />
                         <Route path="/rooms/all" exact component={ListRoomsComponent} />
                         <Route path="/rooms/member/:id" component={MemberComponent} />

@@ -4,8 +4,7 @@ import MemberDataService from '../../service/MemberDataService';
 
 class MemberComponent extends Component {
     constructor(props) {
-        super(props)
-
+        super(props);
         this.state = {
             id: '',
             roomId: this.props.match.params.id,
@@ -13,14 +12,14 @@ class MemberComponent extends Component {
             gender: '',
             role: '',
             dob: ''
-        }
-        this.onSubmit = this.onSubmit.bind(this)
+        };
+        this.onSubmit = this.onSubmit.bind(this);
         this.validate = this.validate.bind(this)
 
     }
 
     componentDidMount() {
-        console.log(this.state.id)
+        console.log(this.state.id);
         if (this.state.id === undefined) {
             return
         }
@@ -36,7 +35,7 @@ class MemberComponent extends Component {
     }
 
     validate(values) {
-        let errors = {}
+        let errors = {};
         if (!values.nickName) {
             errors.nickName = 'Enter a Name'
         } else if (values.nickName.length < 5) {
@@ -59,17 +58,17 @@ class MemberComponent extends Component {
             role: values.role,
             dob: values.dob,
             targetDate: values.targetDate
-        }
+        };
 
         MemberDataService.createMember(member)
-            .then(() => this.props.history.push('/members/all'))
+            .then(() => this.props.history.push('/members/all'));
 
         console.log(values);
     }
 
     render() {
 
-        let { roomId, nickName, gender, role, dob } = this.state
+        let { roomId, nickName, gender, role, dob } = this.state;
 
         return (
             <div>

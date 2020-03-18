@@ -1,89 +1,107 @@
-import React, { Component } from 'react'
-import { Layout, notification } from 'antd';
-const { Content } = Layout;
+import React, { Component } from 'react';
+import { login } from '../../../service/AuthenticationAPI';
+import './Login.css';
+import { Link } from 'react-router-dom';
+import { ACCESS_TOKEN } from '../../../service/AuthenticationAPI';
 
-class Login extends Component {
+import { Form, Input, Button, Icon, notification } from 'antd';
+const FormItem = Form.Item;
+
+// class Login extends Component {
+//   constructor(props) {
+//     super(props);
+//     this.state = {
+//       usernameOremail: {
+//         value: ''
+//       },
+//       password: {
+//         value: ''
+//       }
+//     };
+//
+//     this.handleInputChange = this.handleInputChange.bind(this);
+//     this.handleSubmit = this.handleSubmit.bind(this);
+//   }
+//
+//   render() {
+//     const AntWrappedLoginForm = Form.create()(LoginForm)
+//     return (
+//         <div className="login-container">
+//           <h1 className="page-title">Login</h1>
+//           <div className="login-content">
+//             <AntWrappedLoginForm onLogin={this.props.onLogin} />
+//           </div>
+//         </div>
+//     );
+//   }
+// }
+
+class LoginForm extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      currentUser: null,
-      isAuthenticated: false,
-      isLoading: false
-    }
-    this.handleLogin = this.handleLogin.bind(this);
-
-    notification.config({
-      placement: 'topRight',
-      top: 70,
-      duration: 3,
-    });    
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  loadCurrentUser() {
-    this.setState({
-      isLoading: true
+  handleSubmit(event) {
+    event.preventDefault();
+    this.props.form.validateFields((err, values) => {
+      if (!err) {
+        const loginRequest = Object.assign({}, values);
+        login(loginRequest)
+            .then(response => {
+              localStorage.setItem(ACCESS_TOKEN, response.accessToken);
+              this.props.onLogin();
+            }).catch(error => {
+          if(error.status === 401) {
+            notification.error({
+              message: 'Account App',
+              description: 'Your Username or Password is incorrect. Please try again!'
+            });
+          } else {
+            notification.error({
+              message: 'Account App',
+              description: error.message || 'Sorry! Something went wrong. Please try again!'
+            });
+          }
+        });
+      }
     });
-    getCurrentUser()
-    .then(response => {
-      this.setState({
-        currentUser: response,
-        isAuthenticated: true,
-        isLoading: false
-      });
-    }).catch(error => {
-      this.setState({
-        isLoading: false
-      });  
-    });
-  }
-
-  componentDidMount() {
-    this.loadCurrentUser();
-  }
-
-  /* 
-   This method is called by the Login component after successful login 
-   so that we can load the logged-in user details and set the currentUser &
-   isAuthenticated state, which other components will use to render their JSX
-  */
-  handleLogin() {
-    notification.success({
-      message: 'Chat App',
-      description: "You're successfully logged in.",
-    });
-    this.loadCurrentUser();
-    this.props.history.push("/");
   }
 
   render() {
-    if(this.state.isLoading) {
-      return <LoadingIndicator />
-    }
+    const { getFieldDecorator } = this.props.form;
     return (
-        <Layout className="app-container">
-          <AppHeader isAuthenticated={this.state.isAuthenticated} 
-            currentUser={this.state.currentUser} 
-            onLogout={this.handleLogout} />
-
-          <Content className="app-content">
-            <div className="container">
-              <Switch>      
-                <Route exact path="/" 
-                  render={(props) => <PollList isAuthenticated={this.state.isAuthenticated} 
-                      currentUser={this.state.currentUser} handleLogout={this.handleLogout} {...props} />}>
-                </Route>
-                <Route path="/login" 
-                  render={(props) => <Login onLogin={this.handleLogin} {...props} />}></Route>
-                <Route path="/signup" component={Signup}></Route>
-                <Route path="/users/:username" 
-                  render={(props) => <Profile isAuthenticated={this.state.isAuthenticated} currentUser={this.state.currentUser} {...props}  />}>
-                </Route>
-                <PrivateRoute authenticated={this.state.isAuthenticated} path="/poll/new" component={NewPoll} handleLogout={this.handleLogout}></PrivateRoute>
-                <Route component={NotFound}></Route>
-              </Switch>
-            </div>
-          </Content>
-        </Layout>
+        <Form onSubmit={this.handleSubmit} className="login-form">
+          <FormItem>
+            {getFieldDecorator('usernameOrEmail', {
+              rules: [{ required: true, message: 'Please input your username or email!' }],
+            })(
+                <Input
+                    prefix={<Icon type="user" />}
+                    size="large"
+                    name="usernameOrEmail"
+                    placeholder="Username or Email" />
+            )}
+          </FormItem>
+          <FormItem>
+            {getFieldDecorator('password', {
+              rules: [{ required: true, message: 'Please input your Password!' }],
+            })(
+                <Input
+                    prefix={<Icon type="lock" />}
+                    size="large"
+                    name="password"
+                    type="password"
+                    placeholder="Password"  />
+            )}
+          </FormItem>
+          <FormItem>
+            <Button type="primary" htmlType="submit" size="large" className="login-form-button">Login</Button>
+            Or <Link to="/sign-up">register now!</Link>
+          </FormItem>
+        </Form>
     );
   }
 }
+
+export default LoginForm;
